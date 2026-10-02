@@ -1,0 +1,1 @@
+{"name": "Attin", "short_name": "Attin", "start_url": "./index.html", "scope": "./", "display": "standalone", "background_color": "#eef6f0", "theme_color": "#2f8f65", "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"}, {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]}
