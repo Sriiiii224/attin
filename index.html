@@ -127,7 +127,7 @@ textarea{width:100%;padding:11px 12px;font:inherit;color:var(--ink);background:v
 </head>
 <body>
 <main>
-<header class="brand"><svg viewBox="0 0 48 48" width="52" height="52" role="img" aria-label="Logo Attin"><rect width="48" height="48" rx="15" fill="var(--acc)"/><path d="M13.5 36 24 11.5 34.5 36" fill="none" stroke="var(--accink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="24" cy="28" rx="7.5" ry="3.2" transform="rotate(-18 24 28)" fill="var(--accink)"/></svg><div><h1>Attin</h1><small>Kasir dan catatan kios</small></div></header>
+<header class="brand"><svg viewBox="0 0 48 48" width="52" height="52" role="img" aria-label="Logo Attin"><rect width="48" height="48" rx="15" fill="var(--acc)"/><path d="M13.5 36 24 11.5 34.5 36" fill="none" stroke="var(--accink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="24" cy="28" rx="7.5" ry="3.2" transform="rotate(-18 24 28)" fill="var(--accink)"/></svg><div><h1>Attin</h1><small>Kasir dan catatan kios</small><small id="offl" style="display:block;margin-top:4px;font-weight:600"></small></div></header>
 <nav class="tabs"><button type="button" id="t-kasir">Kasir</button><button type="button" id="t-barang">Barang</button><button type="button" id="t-kasbon">Kasbon</button><button type="button" id="t-kas">Kas</button></nav>
 <div id="v-kas" hidden>
 
@@ -551,7 +551,12 @@ tab('kasir');
 $('tgl').value=today();
 if(S.modal)$('modalIn').value=S.modal.toLocaleString('id-ID');
 render();
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+(function(){var o=document.getElementById('offl');
+  function set(t,ok){o.textContent=t;o.style.color=ok?'var(--in)':'var(--out)'}
+  if(!('serviceWorker' in navigator)){set('Mode offline tidak didukung di sini. Buka lewat Safari atau lewat ikon di layar utama.',false);return}
+  set('Menyiapkan mode offline...',true);
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready}).then(function(){set('Siap dipakai tanpa internet',true)}).catch(function(){set('Mode offline gagal disiapkan. Pastikan alamatnya diawali https.',false)})});
+})();
 </script>
 </body>
 </html>
