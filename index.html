@@ -123,11 +123,13 @@ input:focus,select:focus{outline:2px solid var(--in);outline-offset:0;background
 textarea{width:100%;padding:11px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px}.chk{display:flex;align-items:center;gap:8px;color:var(--ink)}.chk input{width:auto}#blist .qty{flex-wrap:wrap;justify-content:flex-end;max-width:210px}
 #kblist .qty{flex-wrap:wrap;justify-content:flex-end;max-width:230px}
 .kem{margin-top:10px}.kv{font-family:'Fredoka','Nunito',sans-serif;font-size:1.7rem;font-weight:600}.kt{color:var(--mute);font-size:.85rem;text-transform:capitalize}.kd{margin-top:4px;font-weight:800;font-size:1.05rem}.kd.ok{color:var(--in)}.kd.bad{color:var(--out)}
+#setup{position:fixed;top:0;left:0;right:0;bottom:0;z-index:60;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}#setup .card{width:100%;max-width:420px}
 </style>
 </head>
 <body>
+<div id="setup" hidden><section class="card"><b style="font-size:1.2rem">Selamat datang!</b><p class="lbl">Siapa nama tokomu? Nama ini tampil di aplikasi dan di nota. Bisa kamu ubah kapan saja di tab Kas, bagian Pengaturan toko.</p><label for="sn">Nama toko</label><input id="sn" placeholder="contoh: Toko Ibu Ani"><label for="sa">Alamat atau nomor HP (opsional)</label><input id="sa"><p class="err" id="smsg" role="alert"></p><button type="button" class="go" id="sgo">Mulai</button></section></div>
 <main>
-<header class="brand"><svg viewBox="0 0 48 48" width="52" height="52" role="img" aria-label="Logo Attin"><rect width="48" height="48" rx="15" fill="var(--acc)"/><path d="M13.5 36 24 11.5 34.5 36" fill="none" stroke="var(--accink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="24" cy="28" rx="7.5" ry="3.2" transform="rotate(-18 24 28)" fill="var(--accink)"/></svg><div><h1>Attin</h1><small>Kasir dan catatan kios</small><small id="offl" style="display:block;margin-top:4px;font-weight:600"></small></div></header>
+<header class="brand"><svg viewBox="0 0 48 48" width="52" height="52" role="img" aria-label="Logo toko"><rect width="48" height="48" rx="15" fill="var(--acc)"/><text id="brandl" x="24" y="34" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="600" font-size="28" fill="var(--accink)">A</text><ellipse cx="37" cy="11" rx="6.5" ry="2.8" transform="rotate(-38 37 11)" fill="var(--accink)" opacity=".92"/></svg><div><h1 id="brandn">Attin</h1><small>Kasir dan catatan kios</small><small id="offl" style="display:block;margin-top:4px;font-weight:600"></small></div></header>
 <nav class="tabs"><button type="button" id="t-kasir">Kasir</button><button type="button" id="t-barang">Barang</button><button type="button" id="t-kasbon">Kasbon</button><button type="button" id="t-kas">Kas</button></nav>
 <div id="v-kas" hidden>
 
@@ -515,9 +517,11 @@ function renderKb(){
     rt.appendChild(inp);rt.appendChild(bt);rt.appendChild(bl);r.appendChild(l);r.appendChild(rt);L.appendChild(r)});
 }
 $('kbadd').onclick=function(){var n=$('kbn2').value.trim(),j=num($('kbj').value);if(!n||!j){$('kbmsg').textContent='Isi nama dan jumlah utang.';return}kbs().push({id:Date.now(),nama:n,tot:j,paid:0,d:today(),no:0});save();$('kbn2').value='';$('kbj').value='';render();$('kbmsg').textContent='Utang '+n+' tercatat.'};
+function applyToko(){var n=toko().nama||'Attin';$('brandn').textContent=n;$('brandl').textContent=n.charAt(0).toUpperCase();document.title=n;var m=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(m)m.setAttribute('content',n)}
+$('sgo').onclick=function(){var n=$('sn').value.trim();if(!n){$('smsg').textContent='Isi nama tokomu dulu.';return}S.toko={nama:n,alamat:$('sa').value.trim(),pesan:toko().pesan||''};save();fillToko();$('setup').hidden=true};
 function toko(){return S.toko||{}}
-function fillToko(){$('tkn').value=toko().nama||'';$('tka').value=toko().alamat||'';$('tkp').value=toko().pesan||''}
-$('tksave').onclick=function(){S.toko={nama:$('tkn').value.trim(),alamat:$('tka').value.trim(),pesan:$('tkp').value.trim()};save();$('tkmsg').textContent='Tersimpan. Nota berikutnya memakai data ini.'};
+function fillToko(){$('tkn').value=toko().nama||'';$('tka').value=toko().alamat||'';$('tkp').value=toko().pesan||'';applyToko()}
+$('tksave').onclick=function(){S.toko={nama:$('tkn').value.trim(),alamat:$('tka').value.trim(),pesan:$('tkp').value.trim()};save();applyToko();$('tkmsg').textContent='Tersimpan. Nota berikutnya memakai data ini.'};
 
 var curTot=0;
 function tb(n){var s=['','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan','sepuluh','sebelas'];n=Math.floor(n);
@@ -545,7 +549,7 @@ $('bfile').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var 
 var armed=0;
 $('brest').onclick=function(){var t=$('btxt').value.trim();if(!t){bm('Pilih file atau tempel teks dulu.');return}if(!armed){armed=1;$('brest').textContent='Yakin? Data sekarang akan diganti. Tekan lagi';setTimeout(function(){armed=0;$('brest').textContent='Pulihkan data'},5000);return}armed=0;$('brest').textContent='Pulihkan data';doRestore(t)};
 load();
-S.items=S.items||[];S.kb=S.kb||[];fillToko();
+S.items=S.items||[];S.kb=S.kb||[];fillToko();if(!toko().nama)$('setup').hidden=false;
 fillKat();
 tab('kasir');
 $('tgl').value=today();
